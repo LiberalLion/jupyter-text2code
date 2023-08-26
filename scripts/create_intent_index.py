@@ -16,8 +16,7 @@ DATA_DIR = "../jupyter_text2code/jupyter_text2code_serverextension/data"
 
 def get_embedding(command):
     command = re.sub('[^A-Za-z0-9 ]+', '', command).lower()
-    command_embedding = list(np.array(embed([command])[0]))
-    return command_embedding
+    return list(np.array(embed([command])[0]))
 
 # Explicitly persisting TFHUB_CACHE_DIR
 root = os.path.expanduser("~")

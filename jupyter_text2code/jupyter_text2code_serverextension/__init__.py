@@ -54,9 +54,7 @@ class CodeGenerator():
 
     def _get_embedding(self, command):
         command = re.sub('[^A-Za-z0-9 ]+', '', command).lower()
-        #     command_embedding = self.embedding_model.encode(command)[0]
-        command_embedding = list(np.array(self.embedding_model([command])[0]))
-        return command_embedding
+        return list(np.array(self.embedding_model([command])[0]))
 
     def _get_intent(self, query, k=1):
         query_vector = self._get_embedding(query)
@@ -97,7 +95,7 @@ class CodeGenerator():
         """
         Generates code for importing a preset of libraries
         """
-        text = '''
+        return '''
 import pandas as pd
 import numpy as np
 import os
@@ -105,7 +103,6 @@ import plotly.express as px
 import matplotlib.pyplot as plt
 pd.options.plotting.backend = 'plotly'
         '''
-        return text
 
     def _lib_install(self, entity_text, debug=False):
         """
@@ -136,8 +133,7 @@ pd.options.plotting.backend = 'plotly'
 
         var_name = varname_entities[0]  # Assuming only one varname
         fname = fname_entities[0]  # Assuming only 1 fname here
-        code = var_name + " = pd.read_csv('" + fname + "')"
-        return code
+        return var_name + " = pd.read_csv('" + fname + "')"
 
     def _show_df(self, entities, debug=False):
         code = ""
@@ -385,8 +381,7 @@ pd.options.plotting.backend = 'plotly'
         return code
 
     def _dark_theme(self, entities, debug=False):
-        code = "import plotly.io as pio\npio.templates.default = 'plotly_dark'"
-        return code
+        return "import plotly.io as pio\npio.templates.default = 'plotly_dark'"
 
     def synonym_key(self, value, debug=False):
         for k, v in SYNONYMS_MAPPING.items():
@@ -398,8 +393,8 @@ pd.options.plotting.backend = 'plotly'
 
     def generate_code(self, query, df_info_dict={}, debug=False):
         intent = self._get_intent(query)
-        intent_str = self.intent_df[self.intent_df["intent_id"] == intent["idx"]]["template"].values[0]
         if debug:
+            intent_str = self.intent_df[self.intent_df["intent_id"] == intent["idx"]]["template"].values[0]
             print("Intent:", intent_str, " Intent_id:", intent["idx"], " Similarity", intent["similarity"])
         doc = self.nlp(query)
         if debug:
@@ -414,7 +409,11 @@ pd.options.plotting.backend = 'plotly'
 
         entities = []
         for ent in doc.ents:
-            if len(df_columns) > 0 and ent.label_ == 'COLNAME' and ent.text not in df_columns:
+            if (
+                df_columns
+                and ent.label_ == 'COLNAME'
+                and ent.text not in df_columns
+            ):
                 if debug:
                     print(f"{ent.text} wrongly detected as COLNAME")
             else:

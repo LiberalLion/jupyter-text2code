@@ -144,18 +144,14 @@ class TrainDataGenerator:
             return {"intent_id": intent_id, "intent": template}
     
     def generate_training_rows(self, n_rows=10, debug=False):
-        rows = []
-        for _ in tqdm(range(n_rows)):
-            rows.append(self.generate_training_row(debug=debug))
-        return rows
+        return [self.generate_training_row(debug=debug) for _ in tqdm(range(n_rows))]
 
 
 def ner_data(n_rows=1000):
     tdg = TrainDataGenerator(mode="ner")
     rows = tdg.generate_training_rows(n_rows=n_rows)
-    pickle_out = open("ner_train_data.pickle","wb")
-    pickle.dump(rows, pickle_out)
-    pickle_out.close()
+    with open("ner_train_data.pickle","wb") as pickle_out:
+        pickle.dump(rows, pickle_out)
     print("Generated ner data")
 
 def intent_data(n_rows=1000):
